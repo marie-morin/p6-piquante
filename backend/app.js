@@ -61,7 +61,7 @@ app.use(hpp());
 
 app.use(
   session({
-    secret: "Find_Your_Sauce_Sopekocko",
+    secret: process.env.SECRET_SESSION,
     name: "userSession",
     cookie: {
       maxAge: 60000,
