@@ -16,23 +16,23 @@ var hpp = require("hpp");
 const sauceRoutes = require("./routes/sauceRoutes");
 const userRoutes = require("./routes/userRoutes");
 
-const app = express();
+const app = express(); // Start the Express app
 
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-  })
+  }) // Conect app to DB
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"));
 
-app.use(helmet());
+app.use(helmet()); // Helmet middlware for safe headers
 
 const limiter = rateLimit({
   windowMs: 30 * 60 * 1000,
   max: 100,
 });
-app.use(limiter);
+app.use(limiter); // express-rate-limit middleware to limit the amount of request done
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -45,7 +45,7 @@ app.use((req, res, next) => {
     "GET, POST, PUT, DELETE, PATCH, OPTIONS"
   );
   next();
-});
+}); // Setting CORS headers
 
 app.use(bodyParser.json());
 app.use(
@@ -54,10 +54,9 @@ app.use(
   })
 );
 
-app.use(helmet());
-app.use(mongoSanitize());
-app.use(morgan("combined"));
-app.use(hpp());
+app.use(mongoSanitize()); // Mongo sanitize to sanitizes inputs against query selector injection attacks
+app.use(morgan("combined")); // Morgan middleware to create logs
+app.use(hpp()); // HPP middleware to protect against HTTP parameter pollution attacks
 
 app.use(
   session({
@@ -71,7 +70,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
   })
-);
+); // Setting a session
 
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/api/sauces", sauceRoutes);

@@ -11,7 +11,7 @@ const userSchema = mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true, // Using mongoose-unique-validator so two acounts can't be created with the same email
   },
   password: {
     type: String,
@@ -19,7 +19,7 @@ const userSchema = mongoose.Schema({
   },
 });
 
-// Making every email adress unique
+// Appying mongoose-unique-validator to the schema
 userSchema.plugin(uniqueValidator);
 
 // Exporting User Schema
