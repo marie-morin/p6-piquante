@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mailValidator = require("email-validator");
 const passwordValidator = require("password-validator");
+const mongoMask = require("mongo-mask");
+const session = require("express-session");
 
 // Creating a validation schema for password
 var schema = new passwordValidator();
@@ -37,6 +39,7 @@ exports.signup = (req, res, next) => {
       .hash(req.body.password, 10) // Hashing and salting the password
       .then((hash) => {
         const user = new User({
+          // email: mongoMask(req.query.email),
           email: req.body.email,
           password: hash,
         }); // Create new user
@@ -45,7 +48,7 @@ exports.signup = (req, res, next) => {
           .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
           .catch((error) => res.status(400).json({ error }));
       })
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => res.status(501).json({ error }));
   }
 };
 
@@ -65,34 +68,17 @@ exports.login = (req, res, next) => {
               .status(401)
               .json({ message: "Mot de passe incorrect !" }); // Return error if paswwords don't match
           }
-          res.status(200).json({
-            userId: user._id,
-            token: jwt.sign(
-              { userId: user._id },
-              process.env.JWT_SECRET_TOKEN,
-              {
-                expiresIn: "24h",
-              } // Return user id and authorization token to frontend
-            ),
-          });
+
+          const newToken = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET_TOKEN,
+            { expiresIn: "24h" }
+          );
+
+          res.status(200).json({ userId: user._id, token: newToken });
         })
+
         .catch((error) => res.status(401).json({ error }));
     })
     .catch((error) => res.status(500).json({ error }));
 };
-
-// exports.signup = (req, res, next) => {
-//   bcrypt
-//     .hash(req.body.password, 10)
-//     .then((hash) => {
-//       const user = new User({
-//         email: req.body.email,
-//         password: hash,
-//       });
-//       user
-//         .save()
-//         .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-//         .catch((error) => res.status(400).json({ error }));
-//     })
-//     .catch((error) => res.status(500).json({ error }));
-// };
