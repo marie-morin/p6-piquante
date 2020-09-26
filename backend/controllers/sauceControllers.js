@@ -37,10 +37,6 @@ exports.addSauce = (req, res, next) => {
 
 // LIKE OR DISLIKE Sauce
 exports.giveOpinion = (req, res, next) => {
-  // Getting user id and opinion from req
-  const user = req.body.userId;
-  const review = req.body.like;
-
   // User liked the Sauce
   // Pushing user id in usersLikes array and incrementing likes by 1
   if (req.body.like === 1) {
@@ -110,6 +106,7 @@ exports.modifySauce = (req, res, next) => {
   // Finding out if the image has been modifyed
   // If YES, inject req.body.sauce + new image in DB
   // If NO, inject every value from req.body in DB
+
   const sauceObject = req.file
     ? {
         ...JSON.parse(req.body.sauce),

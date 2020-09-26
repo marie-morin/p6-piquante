@@ -12,7 +12,7 @@ const session = require("express-session");
 var schema = new passwordValidator();
 schema
   .is()
-  .min(8)
+  .min(6)
   .is()
   .max(20)
   .has()
@@ -39,7 +39,6 @@ exports.signup = (req, res, next) => {
       .hash(req.body.password, 10) // Hashing and salting the password
       .then((hash) => {
         const user = new User({
-          // email: mongoMask(req.query.email),
           email: req.body.email,
           password: hash,
         }); // Create new user
