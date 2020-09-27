@@ -1,6 +1,8 @@
 // Requires
 const Sauce = require("../models/SauceSchema");
 const fs = require("fs");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv").config();
 
 const regex = /^[a-zA-Z0-9 _.,!()&]+$/;
 
@@ -122,6 +124,19 @@ exports.modifySauce = (req, res, next) => {
         heat: req.body.heat,
         userId: req.body.userId,
       };
+
+  if (
+    !regex.test(sauceObject.name) ||
+    !regex.test(sauceObject.manufacturer) ||
+    !regex.test(sauceObject.description) ||
+    !regex.test(sauceObject.mainPepper) ||
+    !regex.test(sauceObject.heat)
+  ) {
+    return res
+      .status(500)
+      .json({ error: "Des champs contiennent des caractères invalides" }); // Checking from form input values format before dealing with them
+  }
+
   Sauce.updateOne(
     { _id: req.params.id },
     {
